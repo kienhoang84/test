@@ -38,8 +38,7 @@ namespace WinmartTool.AppService
                 List<GCPSales> gcpsaleData = new List<GCPSales>();
                 foreach (var file in lstFile)
                 {
-                    i++;
-                    if (i <= 1000) 
+                    if (file.ToString().Substring(0, 3) == "PLG") 
                     {
                         var dataSales = JsonConvert.DeserializeObject<TransactionPLG>(System.IO.File.ReadAllText(pathLocal + file));
                         if (dataSales != null)
@@ -55,7 +54,7 @@ namespace WinmartTool.AppService
                                     string productName = (product != null) ? product.display_name : "";
 
                                     var tax = _lstProductTax.Where(x => x.prod_id == item.product_id).FirstOrDefault();
-                                    int taxGCP = (tax != null) ? Convert.ToInt16(PLGConst.MappingTax()[tax.tax_id]): 1;
+                                    int taxGCP = (tax != null) ? Convert.ToInt16(PLGConst.MappingTax()[tax.tax_id]): 0;
 
                                     int paymentId = dataSales.TransPaymentEntry.FirstOrDefault().payment_method_id;
                                     gcpsaleData.Add(new GCPSales
@@ -73,26 +72,27 @@ namespace WinmartTool.AppService
                                         qty = Math.Round(item.qty),
                                         vat = taxGCP,
                                         payment_method_id = paymentId,
-                                        amount_total = Math.Round(item.price_subtotal_incl),
+                                        discount = Math.Round(dataSales.TransHeader.discount_amount),
+                                        amount_total = Math.Round(dataSales.TransHeader.amount_total),
                                         state = dataSales.TransHeader.state,
                                     });
                                 }
-                                FileHelper.MoveFileToDestination(pathLocal + file, archive);
                             }
                         }
                     }
-                    else { break; }
+                    FileHelper.MoveFileToDestination(pathLocal + file, archive);
+                    i++;
+                    if (i == 1000)
+                    {
+                        break;
+                    }
                 }
                 if(gcpsaleData.Count > 0)
                 {
                     FileHelper.CreateFileMaster("", "GCP", _configuration["SftpConfig:path_local_process"], JsonConvert.SerializeObject(gcpsaleData));
                 }
-                //FileHelper.WriteLogs(JsonConvert.SerializeObject(gcpsale));
 
             }
-
-
-
         }
     }
 }

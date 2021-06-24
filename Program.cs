@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Threading;
 using WinmartTool.AppService;
 using WinmartTool.Helpers;
 
@@ -32,6 +33,16 @@ namespace WinmartTool
                         SftpHelper sftpHelper = new SftpHelper(_host,_port,_username,_password);
                         sftpHelper.UploadDirectory(_source,_destination,_archive);
                         Console.WriteLine("End process.");
+
+                        if(DateTime.Now.ToString("HH") == "13")
+                        {
+                            FileHelper.WriteLogs("delete: " + _archive);
+                            FileHelper.DeleteFileHistory(_archive, 1000);
+                            Thread.Sleep(200);
+                            FileHelper.WriteLogs("delete: " + _configuration["AppConfig:dataArchived"].ToString());
+                            FileHelper.DeleteFileHistory(_configuration["AppConfig:dataArchived"], 50000);
+                        }
+
                         break;
                     default:
                         break;

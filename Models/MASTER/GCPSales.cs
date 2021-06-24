@@ -19,8 +19,8 @@ namespace WinmartTool.Models.MASTER
         public decimal qty { get; set; }
         public int vat { get; set; }
         public int payment_method_id { get; set; }
+        public decimal discount { get; set; }
         public decimal amount_total { get; set; }
-
         public string state { get; set; }
 
     }

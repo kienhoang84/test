@@ -9,6 +9,7 @@ namespace WinmartTool.Models.PLG
         public pos_order TransHeader { get; set; }
         public List<pos_order_line> TransLine { get; set; }
         public List<pos_payment> TransPaymentEntry { get; set; }
+
     }
     public class pos_order
     {

@@ -8,6 +8,26 @@ namespace WinmartTool.Helpers
 {
     public static class FileHelper
     {
+        public static string GetMasterDataPLG(string _pathLocalMaster, string dataType)
+        {
+            var lstFile = GetFileMasterFromDir(_pathLocalMaster, "*.txt");
+            string strJson = "";
+            if (lstFile.Count > 0)
+            {
+                var fileSelected = lstFile.Where(x => x.Contains(dataType)).FirstOrDefault();
+                strJson = System.IO.File.ReadAllText(_pathLocalMaster + fileSelected);
+            }
+            return strJson;
+        }
+        private static List<string> GetFileMasterFromDir(string path, string extention)
+        {
+            var fileName = (new DirectoryInfo(path))
+                            .GetFiles(extention, SearchOption.AllDirectories).OrderByDescending(x => x.Name)
+                            .Select(a => a.Name)
+                            .ToList();
+
+            return fileName;
+        }
         public static bool CreateFileMaster(string _fileType, string file_name, string _pathSaveFile, string _str)
         {
             CreateFolder(_pathSaveFile);
@@ -22,6 +42,7 @@ namespace WinmartTool.Helpers
                         tw.WriteLine(_str);
                         tw.Close();
                     }
+                    
                 }
                 return true;
             }
